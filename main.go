@@ -5,16 +5,18 @@ import (
 	"test-go-developer/app/route"
 	"test-go-developer/configs"
 	"test-go-developer/database"
+	"test-go-developer/database/migration"
+	"test-go-developer/database/seeder"
 )
 
 func main() {
 	configs.LoadEnv()
 	database.Connect()
-
-	// Create extension default uuid
-	if err := database.DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";").Error; err != nil {
-		log.Fatalf("Failed to create extension \"uuid-ossp\": %v", err)
+	if err := migration.AutoMigrate(); err != nil {
+		log.Fatal(err)
 	}
+
+	seeder.SeedData(database.DB)
 
 	r := route.SetupRouter()
 	if err := r.Run(":" + configs.AppPort); err != nil {

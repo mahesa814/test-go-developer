@@ -1,12 +1,21 @@
 package seeder
 
 import (
+	"fmt"
 	"gorm.io/gorm"
 	"test-go-developer/database/entities"
 	"time"
 )
 
 func SeedData(db *gorm.DB) error {
+	var checkCustomers []entities.Customer
+	result := db.Find(&checkCustomers)
+	if result.Error != nil {
+		panic(result.Error)
+	}
+	if len(checkCustomers) != 0 {
+		return fmt.Errorf("Successfully Seeder")
+	}
 	// Create Customer seed data
 	customers := []entities.Customer{
 		{
@@ -30,12 +39,13 @@ func SeedData(db *gorm.DB) error {
 			SelfiePhoto:  "selfie_jane_doe.jpg",
 		},
 	}
-
-	// Insert Customer seed data
+	var createdIDs []string // Slice to hold created IDs
 	for _, customer := range customers {
 		if err := db.Create(&customer).Error; err != nil {
 			return err
 		}
+		// Append the created customer's ID to the slice
+		createdIDs = append(createdIDs, customer.ID)
 	}
 
 	// Create LoanLimit seed data
@@ -43,38 +53,38 @@ func SeedData(db *gorm.DB) error {
 		{
 			Tenor:      1,
 			Limit:      100000,
-			CustomerID: customers[0].ID,
+			CustomerID: createdIDs[0],
 		}, {
 			Tenor:      2,
 			Limit:      200000,
-			CustomerID: customers[0].ID,
+			CustomerID: createdIDs[0],
 		}, {
 
 			Tenor:      3,
 			Limit:      500000,
-			CustomerID: customers[0].ID,
+			CustomerID: createdIDs[0],
 		}, {
 			Tenor:      6,
 			Limit:      7000000,
-			CustomerID: customers[0].ID,
+			CustomerID: createdIDs[0],
 		},
 		{
 			Tenor:      1,
 			Limit:      1000000,
-			CustomerID: customers[1].ID,
+			CustomerID: createdIDs[1],
 		}, {
 
 			Tenor:      2,
 			Limit:      1200000,
-			CustomerID: customers[1].ID,
+			CustomerID: createdIDs[1],
 		}, {
 			Tenor:      3,
 			Limit:      1500000,
-			CustomerID: customers[1].ID,
+			CustomerID: createdIDs[1],
 		}, {
 			Tenor:      6,
 			Limit:      20000000,
-			CustomerID: customers[0].ID,
+			CustomerID: createdIDs[1],
 		},
 	}
 
@@ -84,6 +94,6 @@ func SeedData(db *gorm.DB) error {
 			return err
 		}
 	}
-
+	fmt.Println("successfully seeder done")
 	return nil
 }

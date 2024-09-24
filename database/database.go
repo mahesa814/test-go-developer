@@ -1,36 +1,32 @@
 package database
 
 import (
-	"log"
-	"test-go-developer/configs"
-
-	"gorm.io/driver/postgres"
+	"fmt"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	"log"
+	"os"
 )
 
 var DB *gorm.DB
 
+// Connect establishes a connection to the MySQL database.
 func Connect() {
-	dsn := "host=" + configs.DatabaseHost + " " + "port=" + configs.DatabasePort + " " + "user=" + configs.DatabaseUser + " " + "password=" + configs.DatabasePassword + " " +
-		"dbname=" + configs.DatabaseName + " " + "sslmode=" + configs.DatabaseSSL
-	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  dsn,
-		PreferSimpleProtocol: true,
-	}), &gorm.Config{
-		SkipDefaultTransaction: true,
-		PrepareStmt:            true,
-		Logger: func() logger.Interface {
-			if configs.DatabaseLog == "disable" {
-				return logger.Default.LogMode(logger.Silent)
-			}
-			return logger.Default.LogMode(logger.Info)
-		}(),
-	})
+	var err error
+	// Build the DSN (Data Source Name)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		os.Getenv("DATABASE_USERNAME"),
+		os.Getenv("DATABASE_PASSWORD"),
+		os.Getenv("DATABASE_HOST"),
+		os.Getenv("DATABASE_PORT"),
+		os.Getenv("DATABASE_NAME"), // Ensure this is set to "test_go"
+	)
 
+	// Connect to the database
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database error: " + err.Error())
+		log.Fatalf("Failed to connect to database: %v", err) // Log and exit on error
 	}
+
 	log.Println("Database connection established")
-	DB = db
 }
