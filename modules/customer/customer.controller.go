@@ -10,7 +10,10 @@ import (
 
 func create(c *gin.Context) {
 	var payload request.CustomerRequests
-
+	if c.Request.ContentLength == 0 {
+		c.JSON(400, gin.H{"error": "Request body cannot be empty"})
+		return
+	}
 	var g = galidator.G()
 
 	var validator = g.Validator(request.CustomerRequests{})
