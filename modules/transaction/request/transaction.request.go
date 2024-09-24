@@ -1,10 +1,13 @@
 package request
 
+type TransactionQuery struct {
+	ContractNumber string `form:"contract_number" json:"contract_number"`
+	AssetName      string `form:"asset_name" json:"asset_name"`
+}
+
 type TransactionRequest struct {
-	ContactNumber        string `json:"contact_number"`
-	OTR                  string `json:"otr"`
-	AdminFee             string `json:"admin_fee"`
-	AmountOfInstallments string `json:"amount_of_installments"`
-	AmountOfInterest     string `json:"amount_of_interest"`
-	AssetName            string `json:"asset_name"`
+	AssetName  string `json:"asset_name" binding:"required" required:"$field is required"`
+	AssetPrice int64  `json:"asset_price" binding:"required" required:"$field is required"`
+	Tenor      int    `json:"tenor" binding:"required" required:"$field is required"`
+	CustomerID string `json:"customer_id" binding:"required" required:"$field is required"`
 }

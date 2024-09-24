@@ -5,6 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"test-go-developer/commons"
 	"test-go-developer/configs"
+	"test-go-developer/modules/customer"
+	"test-go-developer/modules/transaction"
 )
 
 func SetupRouter() *gin.Engine {
@@ -16,7 +18,8 @@ func SetupRouter() *gin.Engine {
 	}())
 
 	r := gin.Default()
-
+	customer.Route(r)
+	transaction.Route(r)
 	// Collect route list for documentation or debugging
 	routes := r.Routes()
 	for _, item := range routes {
